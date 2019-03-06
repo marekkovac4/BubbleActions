@@ -72,7 +72,7 @@ class BubbleActionOverlay extends FrameLayout {
     private Interpolator interpolator;
     private long animationDuration;
     private ClipData dragData;
-    private DragShadowBuilder dragShadowBuilder;
+    private CustomDragShadowBuilder dragShadowBuilder;
     private float startActionDistanceFromCenter;
     private float stopActionDistanceFromCenter;
     private float bubbleDimension;
@@ -85,7 +85,7 @@ class BubbleActionOverlay extends FrameLayout {
     BubbleActionOverlay(Context context) {
         super(context);
         contentClipRect = new RectF();
-        dragShadowBuilder = new DragShadowBuilder();
+        dragShadowBuilder = new CustomDragShadowBuilder();
         dragData = DragUtils.getClipData();
 
         LayoutInflater inflater = LayoutInflater.from(context);
