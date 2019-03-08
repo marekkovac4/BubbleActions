@@ -38,8 +38,11 @@ public final class BubbleActions {
     Action[] actions = new Action[BubbleActionOverlay.MAX_ACTIONS];
     int numActions = 0;
     Drawable indicator;
+    private View itemClicked;
+    private boolean attachToView;
 
-    private BubbleActions(ViewGroup root) {
+    private BubbleActions(ViewGroup root, View item) {
+        this.itemClicked = item;
         this.indicator = ResourcesCompat.getDrawable(root.getResources(), R.drawable.bubble_actions_indicator, root.getContext().getTheme());
         this.root = root;
         overlay = new BubbleActionOverlay(root.getContext());
@@ -76,9 +79,9 @@ public final class BubbleActions {
             throw new IllegalArgumentException("View argument must have a ViewGroup root view");
         }
 
-
-        return new BubbleActions((ViewGroup) rootView);
+        return new BubbleActions((ViewGroup) rootView, view);
     }
+
 
     /**
      * Set the typeface of the labels for the BubbleActions.
@@ -133,6 +136,16 @@ public final class BubbleActions {
      */
     public BubbleActions withDuration(int duration) {
         overlay.setAnimationDuration(duration);
+        return this;
+    }
+
+    public BubbleActions attachToView(boolean attachToView) {
+        this.attachToView = attachToView;
+        return this;
+    }
+
+    public BubbleActions withCustomDrawable(Drawable drawable, int alpha) {
+        overlay.withCustomBackgroundOverlay(drawable, alpha);
         return this;
     }
 
@@ -259,7 +272,10 @@ public final class BubbleActions {
         // use reflection to get the last touched xy location
         try {
             getLastTouchPoint.invoke(viewRootImpl, touchPoint);
-            overlay.setupOverlay(touchPoint.x, touchPoint.y, this);
+            if (attachToView)
+                overlay.setupOverlay(itemClicked.getX() + itemClicked.getWidth() / 2f, itemClicked.getY() + itemClicked.getHeight(), this);
+            else
+                overlay.setupOverlay(touchPoint.x, touchPoint.y, this);
         } catch (InvocationTargetException e) {
             e.printStackTrace();
             return;
@@ -307,7 +323,7 @@ public final class BubbleActions {
                         if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.JELLY_BEAN_MR1) {
                             overlay.requestLayout();
                         }
-
+                        if(!showing)  //TODO test properly
                         overlay.getAnimateSetShow()
                                 .setListener(new ViewPropertyAnimatorListenerAdapter() {
                                     @Override

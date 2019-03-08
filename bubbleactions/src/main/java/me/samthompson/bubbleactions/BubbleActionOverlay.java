@@ -1,12 +1,15 @@
 package me.samthompson.bubbleactions;
 
 import android.animation.ObjectAnimator;
+import android.animation.PropertyValuesHolder;
 import android.animation.TypeEvaluator;
 import android.content.ClipData;
 import android.content.Context;
 import android.graphics.RectF;
 import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
+import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.view.ViewPropertyAnimatorCompatSet;
@@ -29,6 +32,7 @@ class BubbleActionOverlay extends FrameLayout {
      */
     interface OnAttachStateChangeListener {
         void onViewAttachedToWindow(View view);
+
         void onViewDetachedFromWindow(View view);
     }
 
@@ -138,6 +142,16 @@ class BubbleActionOverlay extends FrameLayout {
         this.onAttachStateChangeListener = onAttachStateChangeListener;
     }
 
+    public void withCustomBackgroundOverlay(Drawable drawable, int alpha) {
+        if (drawable != null) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                setBackground(drawable);
+                backgroundAnimator = ObjectAnimator.ofPropertyValuesHolder(drawable, PropertyValuesHolder.ofInt("alpha", 0,alpha));
+                animationDuration = 1000;
+            }
+        }
+    }
+
     void setLabelTypeface(Typeface typeface) {
         for (int i = 1; i <= MAX_ACTIONS; i++) {
             BubbleView itemView = (BubbleView) getChildAt(i);
@@ -154,7 +168,8 @@ class BubbleActionOverlay extends FrameLayout {
     }
 
     void setupOverlay(float originX, float originY, BubbleActions bubbleActions) {
-        backgroundAnimator.setDuration(animationDuration);
+        if (backgroundAnimator != null)
+            backgroundAnimator.setDuration(animationDuration);
         numActions = bubbleActions.numActions;
         if (numActions > MAX_ACTIONS) {
             throw new IllegalArgumentException(TAG + ": actions cannot have more than " + MAX_ACTIONS + " actions. ");
@@ -230,11 +245,13 @@ class BubbleActionOverlay extends FrameLayout {
     }
 
     void animateDimBackground() {
-        backgroundAnimator.start();
+        if (backgroundAnimator != null)
+            backgroundAnimator.start();
     }
 
     void animateUndimBackground() {
-        backgroundAnimator.reverse();
+        if (backgroundAnimator != null)
+            backgroundAnimator.reverse();
     }
 
     void resetBubbleViews() {
