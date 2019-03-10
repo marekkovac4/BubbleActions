@@ -147,7 +147,6 @@ class BubbleActionOverlay extends FrameLayout {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
                 setBackground(drawable);
                 backgroundAnimator = ObjectAnimator.ofPropertyValuesHolder(drawable, PropertyValuesHolder.ofInt("alpha", 0,alpha));
-                animationDuration = 1000;
             }
         }
     }
