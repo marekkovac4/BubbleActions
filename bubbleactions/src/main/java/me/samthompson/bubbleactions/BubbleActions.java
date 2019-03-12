@@ -16,6 +16,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Interpolator;
+import android.widget.TextView;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -146,6 +147,11 @@ public final class BubbleActions {
 
     public BubbleActions withCustomDrawable(Drawable drawable, int alpha) {
         overlay.withCustomBackgroundOverlay(drawable, alpha);
+        return this;
+    }
+
+    public BubbleActions withCustomTextView(TextView textView) {
+        overlay.setCustomTextView(textView);
         return this;
     }
 
@@ -323,22 +329,22 @@ public final class BubbleActions {
                         if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.JELLY_BEAN_MR1) {
                             overlay.requestLayout();
                         }
-                        if(!showing)  //TODO test properly
-                        overlay.getAnimateSetShow()
-                                .setListener(new ViewPropertyAnimatorListenerAdapter() {
-                                    @Override
-                                    public void onAnimationStart(View view) {
-                                        super.onAnimationStart(view);
-                                        overlay.animateDimBackground();
-                                    }
+                        if (!showing)  //TODO test properly
+                            overlay.getAnimateSetShow()
+                                    .setListener(new ViewPropertyAnimatorListenerAdapter() {
+                                        @Override
+                                        public void onAnimationStart(View view) {
+                                            super.onAnimationStart(view);
+                                            overlay.animateDimBackground();
+                                        }
 
-                                    @Override
-                                    public void onAnimationEnd(View view) {
-                                        super.onAnimationEnd(view);
-                                        showing = true;
-                                    }
-                                })
-                                .start();
+                                        @Override
+                                        public void onAnimationEnd(View view) {
+                                            super.onAnimationEnd(view);
+                                            showing = true;
+                                        }
+                                    })
+                                    .start();
                         return true;
                     } else {
                         return false;

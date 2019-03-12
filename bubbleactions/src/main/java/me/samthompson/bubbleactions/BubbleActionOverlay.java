@@ -9,9 +9,9 @@ import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
-import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewCompat;
+import android.support.v4.view.ViewPropertyAnimatorListenerAdapter;
 import android.support.v7.view.ViewPropertyAnimatorCompatSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,12 +20,14 @@ import android.view.animation.Interpolator;
 import android.view.animation.OvershootInterpolator;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 /**
  * A view that implements an overlay that animates up to 5 circular icons radially
  * around a fixed point
  */
-class BubbleActionOverlay extends FrameLayout {
+class BubbleActionOverlay extends FrameLayout implements TextCallback {
+
 
     /**
      * For back-porting OnAttachStateChangeListener back to api 11
@@ -85,6 +87,7 @@ class BubbleActionOverlay extends FrameLayout {
     private int numActions = 0;
     private ObjectAnimator backgroundAnimator;
     private OnAttachStateChangeListener onAttachStateChangeListener;
+    private TextView selectedItemTextView;
 
     BubbleActionOverlay(Context context) {
         super(context);
@@ -133,6 +136,7 @@ class BubbleActionOverlay extends FrameLayout {
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
+        removeView(selectedItemTextView);
         if (onAttachStateChangeListener != null) {
             onAttachStateChangeListener.onViewDetachedFromWindow(this);
         }
@@ -146,9 +150,14 @@ class BubbleActionOverlay extends FrameLayout {
         if (drawable != null) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
                 setBackground(drawable);
-                backgroundAnimator = ObjectAnimator.ofPropertyValuesHolder(drawable, PropertyValuesHolder.ofInt("alpha", 0,alpha));
+                backgroundAnimator = ObjectAnimator.ofPropertyValuesHolder(drawable, PropertyValuesHolder.ofInt("alpha", 0, alpha));
             }
         }
+    }
+
+    public void setCustomTextView(TextView textView) {
+        selectedItemTextView = textView;
+        addView(selectedItemTextView, new LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
     }
 
     void setLabelTypeface(Typeface typeface) {
@@ -212,6 +221,7 @@ class BubbleActionOverlay extends FrameLayout {
         int start = rightOk ? 0 : numActions - 1;
         int end = rightOk ? numActions : -1;
         int delta = rightOk ? 1 : -1;
+        float maxY = 9999;
         for (int i = start; i != end; i += delta) {
             BubbleView bubbleView = (BubbleView) getChildAt(i + 1);
 
@@ -220,6 +230,7 @@ class BubbleActionOverlay extends FrameLayout {
             bubbleView.textView.setText(action.actionName);
             bubbleView.imageView.setImageDrawable(action.bubble);
             bubbleView.callback = action.callback;
+            bubbleView.textCallback = selectedItemTextView != null ? this : null;
 
             // Calculate and set the locations of the BubbleView
             float halfWidth = bubbleView.getWidth() / 2.0f;
@@ -230,13 +241,41 @@ class BubbleActionOverlay extends FrameLayout {
             actionEndY[i] = originY + stopActionDistanceFromCenter * sinAngle - halfHeight;
             actionStartX[i] = originX + startActionDistanceFromCenter * cosAngle - halfWidth;
             actionStartY[i] = originY + startActionDistanceFromCenter * sinAngle - halfHeight;
+            maxY = actionEndY[i] < maxY ? actionEndY[i] : maxY;
             bubbleView.setX(actionStartX[i]);
             bubbleView.setY(actionStartY[i]);
 
             angle += angleDelta;
             actionIndex++;
         }
+        if (selectedItemTextView != null) {
+            selectedItemTextView.setY(maxY);
+            selectedItemTextView.setX(100);
+        }
+    }
 
+    @Override
+    public void showText(boolean show, String name) {
+        selectedItemTextView.setText(name);
+        selectedItemTextView.setVisibility(show ? VISIBLE : GONE);
+/*        if (show) {
+            selectedItemTextView.setVisibility(VISIBLE);
+            ViewCompat.animate(selectedItemTextView)
+                    .alpha(1f)
+                    .setListener(null)
+                    .setDuration(BubbleView.ANIMATION_DURATION);
+        } else {
+            ViewCompat.animate(selectedItemTextView)
+                    .alpha(0f)
+                    .setListener(new ViewPropertyAnimatorListenerAdapter() {
+                        @Override
+                        public void onAnimationEnd(View view) {
+                            super.onAnimationEnd(view);
+                            selectedItemTextView.setVisibility(INVISIBLE);
+                        }
+                    })
+                    .setDuration(BubbleView.ANIMATION_DURATION);
+        }*/
     }
 
     void startDrag() {

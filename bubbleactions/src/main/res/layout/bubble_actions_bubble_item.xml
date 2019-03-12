@@ -25,6 +25,7 @@
         android:id="@+id/bubble_actions_item_icon"
         android:layout_width="@dimen/bubble_actions_bubble_dimension"
         android:layout_height="@dimen/bubble_actions_bubble_dimension"
-        android:layout_gravity="center" />
+        android:layout_gravity="center"
+        android:elevation="2dp"/>
 
 </merge>
