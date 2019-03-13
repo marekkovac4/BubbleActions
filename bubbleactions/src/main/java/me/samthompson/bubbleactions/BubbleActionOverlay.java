@@ -12,6 +12,7 @@ import android.os.Build;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.view.ViewPropertyAnimatorCompatSet;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -174,7 +175,7 @@ class BubbleActionOverlay extends FrameLayout implements TextCallback {
         this.animationDuration = animationDuration;
     }
 
-    void setupOverlay(float originX, float originY, BubbleActions bubbleActions) {
+    void setupOverlay(float originX, float originY, final BubbleActions bubbleActions) {
         if (backgroundAnimator != null)
             backgroundAnimator.setDuration(animationDuration);
         numActions = bubbleActions.numActions;
@@ -221,14 +222,16 @@ class BubbleActionOverlay extends FrameLayout implements TextCallback {
         int end = rightOk ? numActions : -1;
         int delta = rightOk ? 1 : -1;
         float maxY = 9999;
+        String longestName = "";
         for (int i = start; i != end; i += delta) {
             BubbleView bubbleView = (BubbleView) getChildAt(i + 1);
 
             // Bind action specifics to BubbleView
             Action action = bubbleActions.actions[actionIndex];
-            if (selectedItemTextView!=null)
+            if (selectedItemTextView != null) {
                 bubbleView.name = action.actionName.toString();
-            else {
+                longestName = bubbleView.name.length() > longestName.length() ? bubbleView.name : longestName;
+            } else {
                 bubbleView.textView.setText(action.actionName);
             }
             bubbleView.imageView.setImageDrawable(action.bubble);
@@ -251,11 +254,37 @@ class BubbleActionOverlay extends FrameLayout implements TextCallback {
             angle += angleDelta;
             actionIndex++;
         }
+        final float maxYofBubbles = maxY;
+        final String longest = longestName;
+        selectedItemTextView.setText(longest);
+        selectedItemTextView.setVisibility(View.INVISIBLE);
         if (selectedItemTextView != null) {
-            selectedItemTextView.setY(maxY);
-            float halfWidht = getChildAt(1).getWidth() / 2f;
-            selectedItemTextView.setX(actionStartX[0]-halfWidht);
-            selectedItemTextView.setWidth((int) (actionEndX[numActions-1]-actionStartX[0]+halfWidht*3));
+            selectedItemTextView.post(new Runnable() {
+                @Override
+                public void run() {
+                    selectedItemTextView.setText(longest);
+                    selectedItemTextView.setY(maxYofBubbles);
+                    float halfWidht = getChildAt(1).getWidth() / 2f;
+                    selectedItemTextView.setX(actionStartX[0] - halfWidht);
+                    selectedItemTextView.setWidth(selectedItemTextView.getWidth());
+                    selectedItemTextView.setLines(2);
+                    if (selectedItemTextView.getY() < 15) {
+                        int location[] = new int[2];
+                        bubbleActions.getItemClicked().getLocationOnScreen(location);
+                        selectedItemTextView.setY(location[1] - selectedItemTextView.getHeight() / 2f + bubbleActions.getItemClicked().getHeight() / 2f);
+                        if (location[0] - selectedItemTextView.getWidth() > 0) {
+                            selectedItemTextView.setX(location[0] - selectedItemTextView.getWidth() - 5);
+                            selectedItemTextView.setGravity(Gravity.RIGHT);
+                        } else {
+                            selectedItemTextView.setX(location[0] + bubbleActions.getItemClicked().getWidth() + 5);
+                            selectedItemTextView.setGravity(Gravity.LEFT);
+                        }
+
+                        selectedItemTextView.setText("");
+                    } else if (selectedItemTextView.getX() < 5)
+                        selectedItemTextView.setX(5);
+                }
+            });
         }
     }
 

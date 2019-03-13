@@ -66,39 +66,40 @@ class BubbleView extends LinearLayout {
                     return true;
                 case DragEvent.ACTION_DRAG_ENTERED:
                     imageView.setSelected(true);
-                    if (textCallback != null)
-                        textCallback.showText(true, name);
-                    else
-                        ViewCompat.animate(imageView)
-                                .scaleX(SELECTED_SCALE)
-                                .scaleY(SELECTED_SCALE)
-                                .setListener(new ViewPropertyAnimatorListenerAdapter() {
-                                    @Override
-                                    public void onAnimationStart(View view) {
-                                        super.onAnimationStart(view);
+                    ViewCompat.animate(imageView)
+                            .scaleX(SELECTED_SCALE)
+                            .scaleY(SELECTED_SCALE)
+                            .setListener(new ViewPropertyAnimatorListenerAdapter() {
+                                @Override
+                                public void onAnimationStart(View view) {
+                                    super.onAnimationStart(view);
+                                    if (textCallback != null)
+                                        textCallback.showText(true, name);
+                                    else {
                                         textView.setVisibility(VISIBLE);
                                         ViewCompat.animate(textView)
                                                 .alpha(1f)
                                                 .setListener(null)
                                                 .setDuration(ANIMATION_DURATION);
                                     }
-                                })
-                                .setDuration(ANIMATION_DURATION);
+                                }
+                            })
+                            .setDuration(ANIMATION_DURATION);
 
                     return true;
                 case DragEvent.ACTION_DRAG_EXITED:
                     imageView.setSelected(false);
-                    if (textCallback != null)
-                        textCallback.showText(false, name);
-                    else
-                        ViewCompat.animate(imageView)
-                                .scaleX(DESELECTED_SCALE)
-                                .scaleY(DESELECTED_SCALE)
-                                .setDuration(ANIMATION_DURATION)
-                                .setListener(new ViewPropertyAnimatorListenerAdapter() {
-                                    @Override
-                                    public void onAnimationStart(View view) {
-                                        super.onAnimationStart(view);
+                    ViewCompat.animate(imageView)
+                            .scaleX(DESELECTED_SCALE)
+                            .scaleY(DESELECTED_SCALE)
+                            .setDuration(ANIMATION_DURATION)
+                            .setListener(new ViewPropertyAnimatorListenerAdapter() {
+                                @Override
+                                public void onAnimationStart(View view) {
+                                    super.onAnimationStart(view);
+                                    if (textCallback != null)
+                                        textCallback.showText(false, name);
+                                    else
                                         ViewCompat.animate(textView)
                                                 .alpha(0f)
                                                 .setListener(new ViewPropertyAnimatorListenerAdapter() {
@@ -109,9 +110,8 @@ class BubbleView extends LinearLayout {
                                                     }
                                                 })
                                                 .setDuration(ANIMATION_DURATION);
-                                    }
-                                });
-
+                                }
+                            });
                     return true;
                 case DragEvent.ACTION_DROP:
                     callback.doAction();

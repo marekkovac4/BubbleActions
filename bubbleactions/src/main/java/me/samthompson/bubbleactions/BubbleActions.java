@@ -83,6 +83,9 @@ public final class BubbleActions {
         return new BubbleActions((ViewGroup) rootView, view);
     }
 
+    public View getItemClicked() {
+        return itemClicked;
+    }
 
     /**
      * Set the typeface of the labels for the BubbleActions.
