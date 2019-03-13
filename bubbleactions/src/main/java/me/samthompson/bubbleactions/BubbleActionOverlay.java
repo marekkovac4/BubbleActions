@@ -20,7 +20,6 @@ import android.view.animation.Interpolator;
 import android.view.animation.OvershootInterpolator;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 /**
@@ -158,7 +157,10 @@ class BubbleActionOverlay extends FrameLayout implements TextCallback {
 
     public void setCustomTextView(TextView textView) {
         selectedItemTextView = textView;
-        addView(selectedItemTextView, textView.getLayoutParams());
+        if (textView.getLayoutParams() == null)
+            addView(selectedItemTextView, new LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        else
+            addView(selectedItemTextView, textView.getLayoutParams());
     }
 
     void setLabelTypeface(Typeface typeface) {
