@@ -20,6 +20,7 @@ import android.view.animation.Interpolator;
 import android.view.animation.OvershootInterpolator;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 /**
@@ -157,7 +158,7 @@ class BubbleActionOverlay extends FrameLayout implements TextCallback {
 
     public void setCustomTextView(TextView textView) {
         selectedItemTextView = textView;
-        addView(selectedItemTextView, new LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        addView(selectedItemTextView, textView.getLayoutParams());
     }
 
     void setLabelTypeface(Typeface typeface) {
@@ -272,16 +273,17 @@ class BubbleActionOverlay extends FrameLayout implements TextCallback {
                         int location[] = new int[2];
                         bubbleActions.getItemClicked().getLocationOnScreen(location);
                         selectedItemTextView.setY(location[1] - selectedItemTextView.getHeight() / 2f + bubbleActions.getItemClicked().getHeight() / 2f);
+                        FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) selectedItemTextView.getLayoutParams();
                         if (location[0] - selectedItemTextView.getWidth() > 0) {
-                            selectedItemTextView.setX(location[0] - selectedItemTextView.getWidth() - 5);
+                            selectedItemTextView.setX(location[0] - selectedItemTextView.getWidth() - layoutParams.rightMargin);
                             selectedItemTextView.setGravity(Gravity.RIGHT);
                         } else {
-                            selectedItemTextView.setX(location[0] + bubbleActions.getItemClicked().getWidth() + 5);
+                            selectedItemTextView.setX(location[0] + bubbleActions.getItemClicked().getWidth() + layoutParams.leftMargin);
                             selectedItemTextView.setGravity(Gravity.LEFT);
                         }
 
                         selectedItemTextView.setText("");
-                    } else if (selectedItemTextView.getX() < 5)
+                    } else if (selectedItemTextView.getX() < 10)
                         selectedItemTextView.setX(5);
                 }
             });
