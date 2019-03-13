@@ -26,6 +26,7 @@ class BubbleView extends LinearLayout {
     TextView textView;
     ImageView imageView;
     TextCallback textCallback;
+    String name;
 
     public BubbleView(Context context) {
         super(context);
@@ -66,7 +67,7 @@ class BubbleView extends LinearLayout {
                 case DragEvent.ACTION_DRAG_ENTERED:
                     imageView.setSelected(true);
                     if (textCallback != null)
-                        textCallback.showText(true, textView.getText().toString());
+                        textCallback.showText(true, name);
                     else
                         ViewCompat.animate(imageView)
                                 .scaleX(SELECTED_SCALE)
@@ -88,7 +89,7 @@ class BubbleView extends LinearLayout {
                 case DragEvent.ACTION_DRAG_EXITED:
                     imageView.setSelected(false);
                     if (textCallback != null)
-                        textCallback.showText(false, textView.getText().toString());
+                        textCallback.showText(false, name);
                     else
                         ViewCompat.animate(imageView)
                                 .scaleX(DESELECTED_SCALE)

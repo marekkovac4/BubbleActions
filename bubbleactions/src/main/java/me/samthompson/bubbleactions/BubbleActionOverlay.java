@@ -11,7 +11,6 @@ import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewCompat;
-import android.support.v4.view.ViewPropertyAnimatorListenerAdapter;
 import android.support.v7.view.ViewPropertyAnimatorCompatSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -227,7 +226,11 @@ class BubbleActionOverlay extends FrameLayout implements TextCallback {
 
             // Bind action specifics to BubbleView
             Action action = bubbleActions.actions[actionIndex];
-            bubbleView.textView.setText(action.actionName);
+            if (selectedItemTextView!=null)
+                bubbleView.name = action.actionName.toString();
+            else {
+                bubbleView.textView.setText(action.actionName);
+            }
             bubbleView.imageView.setImageDrawable(action.bubble);
             bubbleView.callback = action.callback;
             bubbleView.textCallback = selectedItemTextView != null ? this : null;
@@ -250,7 +253,9 @@ class BubbleActionOverlay extends FrameLayout implements TextCallback {
         }
         if (selectedItemTextView != null) {
             selectedItemTextView.setY(maxY);
-            selectedItemTextView.setX(100);
+            float halfWidht = getChildAt(1).getWidth() / 2f;
+            selectedItemTextView.setX(actionStartX[0]-halfWidht);
+            selectedItemTextView.setWidth((int) (actionEndX[numActions-1]-actionStartX[0]+halfWidht*3));
         }
     }
 
@@ -258,24 +263,6 @@ class BubbleActionOverlay extends FrameLayout implements TextCallback {
     public void showText(boolean show, String name) {
         selectedItemTextView.setText(name);
         selectedItemTextView.setVisibility(show ? VISIBLE : GONE);
-/*        if (show) {
-            selectedItemTextView.setVisibility(VISIBLE);
-            ViewCompat.animate(selectedItemTextView)
-                    .alpha(1f)
-                    .setListener(null)
-                    .setDuration(BubbleView.ANIMATION_DURATION);
-        } else {
-            ViewCompat.animate(selectedItemTextView)
-                    .alpha(0f)
-                    .setListener(new ViewPropertyAnimatorListenerAdapter() {
-                        @Override
-                        public void onAnimationEnd(View view) {
-                            super.onAnimationEnd(view);
-                            selectedItemTextView.setVisibility(INVISIBLE);
-                        }
-                    })
-                    .setDuration(BubbleView.ANIMATION_DURATION);
-        }*/
     }
 
     void startDrag() {
