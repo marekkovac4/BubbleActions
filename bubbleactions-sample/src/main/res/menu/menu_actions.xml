@@ -3,14 +3,14 @@
 
     <item android:id="@+id/action_star"
         android:icon="@drawable/bubble_star"
-        android:title="Star" />
+        android:title="Edit" />
 
     <item android:id="@+id/action_share"
         android:icon="@drawable/bubble_share"
-        android:title="Share" />
+        android:title="Product Stock" />
 
     <item android:id="@+id/action_hide"
         android:icon="@drawable/bubble_hide"
-        android:title="Hide" />
+        android:title="Delete" />
 
 </menu>
