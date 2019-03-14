@@ -263,7 +263,7 @@ class BubbleActionOverlay extends FrameLayout implements TextCallback {
             int location[] = new int[2];
             bubbleActions.getItemClicked().getLocationOnScreen(location);
             selectedItemTextView.setX(location[0]);
-            selectedItemTextView.setWidth((int) (actionEndX[rightOk ? numActions - 1 : 0] - location[0] + getChildAt(1).getWidth()));
+            selectedItemTextView.setWidth((int) (actionEndX[rightOk ? numActions - 1 : 0] - location[0] + bubbleDimension));
             if (selectedItemTextView.getY() < 15) {
                 selectedItemTextView.setY(location[1] + bubbleActions.getItemClicked().getHeight() + layoutParams.topMargin);
             }
