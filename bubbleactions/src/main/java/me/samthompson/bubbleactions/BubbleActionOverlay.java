@@ -233,6 +233,9 @@ class BubbleActionOverlay extends FrameLayout implements TextCallback {
             if (selectedItemTextView != null) {
                 bubbleView.name = action.actionName.toString();
                 longestName = bubbleView.name.length() > longestName.length() ? bubbleView.name : longestName;
+                bubbleView.textView.setText(action.actionName);
+                bubbleView.textView.setVisibility(View.GONE);
+
             } else {
                 bubbleView.textView.setText(action.actionName);
             }
