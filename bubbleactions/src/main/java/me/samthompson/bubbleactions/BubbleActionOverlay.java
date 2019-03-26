@@ -21,6 +21,8 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+
 /**
  * A view that implements an overlay that animates up to 5 circular icons radially
  * around a fixed point
@@ -225,6 +227,7 @@ class BubbleActionOverlay extends FrameLayout implements TextCallback {
         int delta = rightOk ? 1 : -1;
         float maxY = 9999;
         String longestName = "";
+        ArrayList<BubbleView> bubbles = new ArrayList<>();
         for (int i = start; i != end; i += delta) {
             BubbleView bubbleView = (BubbleView) getChildAt(i + 1);
 
@@ -254,20 +257,28 @@ class BubbleActionOverlay extends FrameLayout implements TextCallback {
             maxY = actionEndY[i] < maxY ? actionEndY[i] : maxY;
             bubbleView.setX(actionStartX[i]);
             bubbleView.setY(actionStartY[i]);
-
+            bubbles.add(bubbleView);
             angle += angleDelta;
             actionIndex++;
         }
 
         if (selectedItemTextView != null) {
             FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) selectedItemTextView.getLayoutParams();
-            selectedItemTextView.setY(maxY-layoutParams.bottomMargin);
+            selectedItemTextView.setY(maxY - layoutParams.bottomMargin);
             int location[] = new int[2];
             bubbleActions.getItemClicked().getLocationOnScreen(location);
             selectedItemTextView.setX(location[0]);
             selectedItemTextView.setWidth((int) (actionEndX[rightOk ? numActions - 1 : 0] - location[0] + bubbleDimension));
             if (selectedItemTextView.getY() < 15) {
-                selectedItemTextView.setY(location[1] + bubbleActions.getItemClicked().getHeight() + layoutParams.topMargin);
+                maxY = 0;
+                for (int i = start; i != end; i += delta) {
+                    BubbleView bubbleView = (BubbleView) getChildAt(i + 1);
+                    actionStartY[i] = originY - actionStartY[i] + originY - bubbleView.getHeight();
+                    actionEndY[i] = originY - actionEndY[i] + originY - bubbleView.getHeight();
+                    bubbleView.setY(actionStartY[i]);
+                    maxY = bubbleView.getY() + bubbleView.getHeight() > maxY ? bubbleView.getY() + bubbleView.getHeight() : maxY;
+                }
+                selectedItemTextView.setY(maxY + bubbleDimension + layoutParams.topMargin);
             }
         }
     }
